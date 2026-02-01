@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Bear Stars">
+    <meta name="theme-color" content="#4a90d9">
+    <title>Paul's Bear Stars</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect width='200' height='200' rx='40' fill='%234a90d9'/><text x='100' y='130' font-size='120' text-anchor='middle'>&#x1F9F8;</text></svg>">
+    <style>
+        /* ==================== CSS RESET & BASE ==================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-primary: #FFF8E7;
+            --bg-secondary: #FFE4B5;
+            --accent-blue: #4a90d9;
+            --accent-green: #5cb85c;
+            --accent-red: #e74c3c;
+            --accent-orange: #f39c12;
+            --accent-purple: #9b59b6;
+            --accent-pink: #e91e8a;
+            --star-gold: #FFD700;
+            --bear-brown: #8B5E3C;
+            --bear-light: #D2A679;
+            --bear-dark: #6B4226;
+            --text-dark: #3a2a1a;
+            --text-medium: #6b5a4a;
+            --card-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --safe-top: env(safe-area-inset-top, 20px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-dark);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+        }
+
+        /* ==================== VIEWS ==================== */
+        .view {
+            display: none;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .view.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==================== MAIN VIEW ==================== */
+        #mainView {
+            background: linear-gradient(180deg, #87CEEB 0%, #B0E0FF 30%, var(--bg-primary) 30%);
+        }
+
+        .header {
+            text-align: center;
+            padding: calc(var(--safe-top) + 10px) 16px 10px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* Bear Avatar */
+        .bear-container {
+            position: relative;
+            width: 100px;
+            height: 110px;
+            margin: 0 auto 5px;
+        }
+
+        .bear {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bear-ear {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: var(--bear-brown);
+            border-radius: 50%;
+            top: 0;
+        }
+
+        .bear-ear::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: var(--bear-light);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .bear-ear.left { left: 10px; }
+        .bear-ear.right { right: 10px; }
+
+        .bear-face {
+            position: absolute;
+            width: 80px;
+            height: 78px;
+            background: var(--bear-brown);
+            border-radius: 50%;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.15);
+        }
+
+        .bear-inner-face {
+            position: absolute;
+            width: 52px;
+            height: 38px;
+            background: var(--bear-light);
+            border-radius: 50%;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .bear-eye {
+            position: absolute;
+            width: 10px;
+            height: 12px;
+            background: #2c1810;
+            border-radius: 50%;
+            top: 28px;
+        }
+
+        .bear-eye::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+        }
+
+        .bear-eye.left { left: 20px; }
+        .bear-eye.right { right: 20px; }
+
+        .bear-nose {
+            position: absolute;
+            width: 14px;
+            height: 10px;
+            background: #2c1810;
+            border-radius: 50%;
+            top: 42px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .bear-mouth {
+            position: absolute;
+            width: 24px;
+            height: 10px;
+            border: 2px solid #2c1810;
+            border-top: none;
+            border-radius: 0 0 50% 50%;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .bear-blush {
+            position: absolute;
+            width: 14px;
+            height: 8px;
+            background: rgba(255, 150, 150, 0.5);
+            border-radius: 50%;
+            top: 40px;
+        }
+
+        .bear-blush.left { left: 10px; }
+        .bear-blush.right { right: 10px; }
+
+        .bear-container.celebrating .bear {
+            animation: bearBounce 0.4s ease infinite;
+        }
+
+        @keyframes bearBounce {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            25% { transform: translateY(-8px) rotate(-3deg); }
+            75% { transform: translateY(-8px) rotate(3deg); }
+        }
+
+        /* Child name */
+        .child-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        /* Star Counter */
+        .star-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 24px;
+            border-radius: 30px;
+            box-shadow: var(--card-shadow);
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        .star-icon {
+            font-size: 28px;
+            animation: starPulse 2s ease infinite;
+        }
+
+        @keyframes starPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .star-count {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .star-target {
+            font-size: 16px;
+            color: var(--text-medium);
+            font-weight: 600;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 10px 24px 6px;
+            flex-shrink: 0;
+        }
+
+        .progress-bar {
+            height: 16px;
+            background: #e0d5c5;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--star-gold), #FFA500);
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            right: 4px;
+            height: 4px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 4px;
+        }
+
+        .progress-label {
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-medium);
+            margin-top: 4px;
+        }
+
+        .reward-icon {
+            font-size: 16px;
+        }
+
+        /* Section label */
+        .section-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-medium);
+            padding: 8px 24px 4px;
+            flex-shrink: 0;
+        }
+
+        /* Task Grid */
+        .task-grid-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px 12px calc(70px + var(--safe-bottom));
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding-bottom: 20px;
+        }
+
+        /* Task Card */
+        .task-card {
+            background: white;
+            border-radius: 18px;
+            padding: 12px 6px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid transparent;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .task-card:active {
+            transform: scale(0.93);
+        }
+
+        .task-card.completed {
+            background: #E8F5E9;
+            border-color: var(--accent-green);
+        }
+
+        .task-card.completed .task-emoji {
+            opacity: 0.6;
+        }
+
+        .task-card .task-emoji {
+            font-size: 38px;
+            line-height: 1.1;
+        }
+
+        .task-card .task-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.2;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .task-card .task-check {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .task-card.completed .task-check {
+            display: flex;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px calc(10px + var(--safe-bottom));
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .bottom-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: none;
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-medium);
+            cursor: pointer;
+            padding: 4px 12px;
+        }
+
+        .bottom-btn .btn-icon {
+            font-size: 24px;
+        }
+
+        .bottom-btn.active {
+            color: var(--accent-blue);
+        }
+
+        .reset-today-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 24px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(74, 144, 217, 0.3);
+        }
+
+        .reset-today-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ==================== STAR ANIMATION OVERLAY ==================== */
+        .star-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .star-overlay.active {
+            display: flex;
+        }
+
+        .star-popup {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            text-align: center;
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .star-popup .big-star {
+            font-size: 80px;
+            animation: starSpin 0.6s ease;
+        }
+
+        @keyframes starSpin {
+            0% { transform: scale(0) rotate(-180deg); }
+            60% { transform: scale(1.3) rotate(10deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        .star-popup .popup-text {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-top: 10px;
+        }
+
+        .star-popup .popup-subtext {
+            font-size: 16px;
+            color: var(--text-medium);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .flying-star {
+            position: fixed;
+            font-size: 30px;
+            z-index: 200;
+            pointer-events: none;
+        }
+
+        /* ==================== CELEBRATION VIEW ==================== */
+        #celebrationView {
+            background: linear-gradient(180deg, #1a0533, #2d1b69, #4a2c8a);
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 50;
+        }
+
+        .celebration-content {
+            z-index: 2;
+            padding: 20px;
+        }
+
+        .celebration-emoji {
+            font-size: 80px;
+            animation: celebBounce 0.5s ease infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes celebBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+        }
+
+        .celebration-title {
+            font-size: 34px;
+            font-weight: 900;
+            color: var(--star-gold);
+            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .celebration-subtitle {
+            font-size: 20px;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .celebration-reward {
+            font-size: 60px;
+            margin: 20px 0;
+            animation: rewardPulse 1s ease infinite;
+        }
+
+        @keyframes rewardPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .celebration-message {
+            font-size: 18px;
+            color: #ccc;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .claim-btn {
+            background: linear-gradient(135deg, var(--star-gold), #FFA500);
+            color: var(--text-dark);
+            border: none;
+            border-radius: 30px;
+            padding: 16px 40px;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+            animation: claimPulse 2s ease infinite;
+        }
+
+        @keyframes claimPulse {
+            0%, 100% { box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 5px 30px rgba(255, 215, 0, 0.7); }
+        }
+
+        .claim-btn:active {
+            transform: scale(0.95);
+        }
+
+        .confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .celebration-stars {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .celebration-stars span {
+            font-size: 24px;
+            animation: starTwinkle 1s ease infinite;
+        }
+
+        .celebration-stars span:nth-child(2) { animation-delay: 0.2s; }
+        .celebration-stars span:nth-child(3) { animation-delay: 0.4s; }
+        .celebration-stars span:nth-child(4) { animation-delay: 0.6s; }
+        .celebration-stars span:nth-child(5) { animation-delay: 0.8s; }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.7); }
+        }
+
+        /* ==================== SETTINGS VIEW ==================== */
+        #settingsView {
+            background: var(--bg-primary);
+            z-index: 40;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: calc(var(--safe-top) + 12px) 16px 12px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+
+        .settings-title {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .settings-close-btn {
+            background: #eee;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-scroll {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px;
+            padding-bottom: calc(20px + var(--safe-bottom));
+        }
+
+        .settings-section {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .settings-section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-section-title .icon {
+            font-size: 20px;
+        }
+
+        /* Reward threshold slider */
+        .threshold-display {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .threshold-value {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--accent-blue);
+        }
+
+        .threshold-label {
+            font-size: 14px;
+            color: var(--text-medium);
+            font-weight: 600;
+        }
+
+        .threshold-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e0d5c5;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .threshold-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        /* Sound toggle */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .toggle-label {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: none;
+        }
+
+        .toggle-switch.on {
+            background: var(--accent-green);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.on::after {
+            transform: translateX(22px);
+        }
+
+        /* Task management */
+        .task-list-manage {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .task-manage-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 4px;
+            border-bottom: 1px solid #f0e8d8;
+        }
+
+        .task-manage-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-manage-emoji {
+            font-size: 24px;
+            width: 32px;
+            text-align: center;
+        }
+
+        .task-manage-label {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .task-manage-delete {
+            background: var(--accent-red);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Add task form */
+        .add-task-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .add-task-form input {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 14px;
+            border: 2px solid #e0d5c5;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .add-task-form input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .emoji-input {
+            width: 54px !important;
+            text-align: center;
+            font-size: 22px !important;
+            flex: none !important;
+        }
+
+        .add-task-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .add-task-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Reset buttons */
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .reset-btn:last-child {
+            margin-bottom: 0;
+        }
+
+        .reset-btn.warning {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .reset-btn.danger {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .reset-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* ==================== PARENT GATE ==================== */
+        .parent-gate-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 90;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .parent-gate-overlay.active {
+            display: flex;
+        }
+
+        .parent-gate-box {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        }
+
+        .parent-gate-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .parent-gate-subtitle {
+            font-size: 14px;
+            color: var(--text-medium);
+            margin-bottom: 20px;
+        }
+
+        .hold-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid #e0d5c5;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .hold-progress {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            width: 108px;
+            height: 108px;
+        }
+
+        .hold-progress circle {
+            fill: none;
+            stroke-width: 4;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: center;
+        }
+
+        .hold-progress .bg {
+            stroke: #e0d5c5;
+        }
+
+        .hold-progress .fg {
+            stroke: var(--accent-blue);
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            transition: none;
+        }
+
+        .parent-gate-cancel {
+            background: none;
+            border: none;
+            color: var(--text-medium);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* ==================== UNDO TOAST ==================== */
+        .undo-toast {
+            display: none;
+            position: fixed;
+            bottom: calc(80px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 80;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .undo-toast.active {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .undo-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 4px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* ==================== HISTORY VIEW ==================== */
+        #historyView {
+            background: var(--bg-primary);
+        }
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: calc(var(--safe-top) + 12px) 16px 12px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+
+        .history-title {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .history-close-btn {
+            background: #eee;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-scroll {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px;
+            padding-bottom: calc(20px + var(--safe-bottom));
+        }
+
+        .history-stat {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .history-stat-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--accent-blue);
+        }
+
+        .history-stat-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-medium);
+        }
+
+        .history-rewards {
+            display: flex;
+            gap: 12px;
+        }
+
+        .history-rewards .history-stat {
+            flex: 1;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (min-width: 768px) {
+            .task-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 14px;
+                max-width: 700px;
+                margin: 0 auto;
+            }
+
+            .task-card {
+                min-height: 120px;
+                border-radius: 22px;
+                padding: 16px 8px;
+            }
+
+            .task-card .task-emoji {
+                font-size: 48px;
+            }
+
+            .task-card .task-label {
+                font-size: 13px;
+            }
+
+            .bear-container {
+                width: 130px;
+                height: 140px;
+            }
+
+            .bear-ear { width: 40px; height: 40px; }
+            .bear-ear.left { left: 12px; }
+            .bear-ear.right { right: 12px; }
+            .bear-face { width: 100px; height: 96px; top: 22px; }
+            .bear-inner-face { width: 65px; height: 48px; }
+            .bear-eye { width: 12px; height: 14px; top: 30px; }
+            .bear-eye.left { left: 24px; }
+            .bear-eye.right { right: 24px; }
+            .bear-nose { width: 16px; height: 12px; top: 46px; }
+            .bear-mouth { width: 28px; height: 12px; top: 54px; }
+            .bear-blush { width: 16px; height: 10px; top: 42px; }
+
+            .child-name {
+                font-size: 26px;
+            }
+
+            .star-count {
+                font-size: 30px;
+            }
+
+            .progress-container {
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .celebration-title {
+                font-size: 42px;
+            }
+
+            .star-popup .big-star {
+                font-size: 100px;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 374px) {
+            .task-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .task-card .task-emoji {
+                font-size: 32px;
+            }
+
+            .bear-container {
+                width: 80px;
+                height: 90px;
+            }
+        }
+
+        /* ==================== REWARD PICKER VIEW ==================== */
+        #rewardPickerView {
+            background: linear-gradient(180deg, #FFE4B5 0%, var(--bg-primary) 100%);
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .reward-picker-content {
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .reward-picker-bear {
+            font-size: 60px;
+            margin-bottom: 8px;
+        }
+
+        .reward-picker-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .reward-picker-subtitle {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-medium);
+            margin-bottom: 20px;
+        }
+
+        .reward-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .reward-option {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: white;
+            border: 3px solid transparent;
+            border-radius: 20px;
+            padding: 14px 18px;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.15s ease, border-color 0.15s ease;
+            text-align: left;
+        }
+
+        .reward-option:active {
+            transform: scale(0.96);
+        }
+
+        .reward-option.selected {
+            border-color: var(--star-gold);
+            background: #FFFDF0;
+        }
+
+        .reward-option-emoji {
+            font-size: 40px;
+            flex-shrink: 0;
+            width: 50px;
+            text-align: center;
+        }
+
+        .reward-option-info {
+            flex: 1;
+        }
+
+        .reward-option-name {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .reward-option-desc {
+            font-size: 12px;
+            color: var(--text-medium);
+            font-weight: 600;
+        }
+
+        /* Current reward badge on main screen */
+        .current-reward-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin: 6px auto 0;
+            cursor: pointer;
+            background: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 2px solid var(--star-gold);
+            width: fit-content;
+        }
+
+        .current-reward-badge .badge-emoji {
+            font-size: 22px;
+        }
+
+        .current-reward-badge .badge-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .current-reward-badge .badge-change {
+            font-size: 11px;
+            color: var(--accent-blue);
+            font-weight: 700;
+        }
+
+        /* Landscape mode */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .header {
+                padding-top: 8px;
+                padding-bottom: 4px;
+            }
+
+            .bear-container {
+                width: 60px;
+                height: 70px;
+                margin-bottom: 2px;
+            }
+
+            .child-name { font-size: 16px; }
+            .star-counter { padding: 4px 16px; }
+            .star-icon { font-size: 20px; }
+            .star-count { font-size: 20px; }
+
+            .progress-container {
+                margin: 4px 24px;
+            }
+
+            .progress-bar { height: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== MAIN VIEW ==================== -->
+    <div id="mainView" class="view active">
+        <div class="header">
+            <div class="bear-container" id="bearAvatar">
+                <div class="bear">
+                    <div class="bear-ear left"></div>
+                    <div class="bear-ear right"></div>
+                    <div class="bear-face">
+                        <div class="bear-eye left"></div>
+                        <div class="bear-eye right"></div>
+                        <div class="bear-blush left"></div>
+                        <div class="bear-blush right"></div>
+                        <div class="bear-inner-face"></div>
+                        <div class="bear-nose"></div>
+                        <div class="bear-mouth"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="child-name" id="childName">Paul's Stars</div>
+            <div class="star-counter">
+                <span class="star-icon">&#11088;</span>
+                <span class="star-count" id="starCount">0</span>
+                <span class="star-target" id="starTarget">/ 30</span>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-label">
+                <span id="progressText">0 more stars to earn</span> <span class="reward-icon" id="progressRewardIcon">&#127851;</span>
+            </div>
+        </div>
+
+        <div class="current-reward-badge" id="rewardBadge" onclick="showRewardPicker()">
+            <span class="badge-emoji" id="badgeEmoji">&#127851;</span>
+            <span class="badge-label" id="badgeLabel">Chocolate</span>
+            <span class="badge-change">change</span>
+        </div>
+
+        <div class="section-label">Tap a task when Paul completes it!</div>
+
+        <div class="task-grid-wrapper">
+            <div class="task-grid" id="taskGrid"></div>
+        </div>
+
+        <div class="bottom-bar">
+            <button class="bottom-btn" id="historyBtn" onclick="showHistory()">
+                <span class="btn-icon">&#127942;</span>
+                <span>Rewards</span>
+            </button>
+            <button class="reset-today-btn" id="newDayBtn" onclick="resetToday()">New Day</button>
+            <button class="bottom-btn" id="settingsBtn" onclick="showParentGate()">
+                <span class="btn-icon">&#9881;&#65039;</span>
+                <span>Settings</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== REWARD PICKER VIEW ==================== -->
+    <div id="rewardPickerView" class="view">
+        <div class="reward-picker-content">
+            <div class="reward-picker-bear">&#129528;</div>
+            <div class="reward-picker-title">Pick Your Reward!</div>
+            <div class="reward-picker-subtitle">What do you want to work for today?</div>
+            <div class="reward-options" id="rewardOptions"></div>
+        </div>
+    </div>
+
+    <!-- ==================== STAR OVERLAY ==================== -->
+    <div class="star-overlay" id="starOverlay">
+        <div class="star-popup">
+            <div class="big-star">&#11088;</div>
+            <div class="popup-text" id="popupText">Great job!</div>
+            <div class="popup-subtext" id="popupSubtext">+1 Star!</div>
+        </div>
+    </div>
+
+    <!-- ==================== CELEBRATION VIEW ==================== -->
+    <div id="celebrationView" class="view">
+        <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+        <div class="celebration-content">
+            <div class="celebration-stars">
+                <span>&#11088;</span><span>&#11088;</span><span>&#11088;</span><span>&#11088;</span><span>&#11088;</span>
+            </div>
+            <div class="celebration-emoji">&#129395;</div>
+            <div class="celebration-title" id="celebTitle">AMAZING!</div>
+            <div class="celebration-subtitle" id="celebSubtitle">Paul earned all the stars!</div>
+            <div class="celebration-reward" id="celebRewardEmoji">&#127851;</div>
+            <div class="celebration-message" id="celebRewardMessage">Time for a sweet treat!</div>
+            <button class="claim-btn" onclick="claimReward()">Claim Reward!</button>
+        </div>
+    </div>
+
+    <!-- ==================== SETTINGS VIEW ==================== -->
+    <div id="settingsView" class="view">
+        <div class="settings-header">
+            <div class="settings-title">&#9881;&#65039; Parent Settings</div>
+            <button class="settings-close-btn" onclick="closeSettings()">&#10005;</button>
+        </div>
+        <div class="settings-scroll">
+            <!-- Reward threshold -->
+            <div class="settings-section">
+                <div class="settings-section-title">
+                    <span class="icon">&#127851;</span> Reward Threshold
+                </div>
+                <div class="threshold-display">
+                    <div class="threshold-value" id="thresholdDisplay">30</div>
+                    <div class="threshold-label">stars needed for a reward</div>
+                </div>
+                <input type="range" class="threshold-slider" id="thresholdSlider" min="5" max="50" step="5" value="30" oninput="updateThreshold(this.value)">
+            </div>
+
+            <!-- Sound -->
+            <div class="settings-section">
+                <div class="settings-section-title">
+                    <span class="icon">&#128266;</span> Sound
+                </div>
+                <div class="toggle-row">
+                    <span class="toggle-label">Sound effects</span>
+                    <button class="toggle-switch on" id="soundToggle" onclick="toggleSound()"></button>
+                </div>
+            </div>
+
+            <!-- Task Management -->
+            <div class="settings-section">
+                <div class="settings-section-title">
+                    <span class="icon">&#128203;</span> Manage Tasks
+                </div>
+                <div class="task-list-manage" id="taskListManage"></div>
+                <div class="add-task-form">
+                    <input type="text" class="emoji-input" id="newTaskEmoji" placeholder="&#128054;" maxlength="4">
+                    <input type="text" id="newTaskLabel" placeholder="Task name...">
+                    <button class="add-task-btn" onclick="addNewTask()">Add</button>
+                </div>
+            </div>
+
+            <!-- Reset -->
+            <div class="settings-section">
+                <div class="settings-section-title">
+                    <span class="icon">&#128260;</span> Reset
+                </div>
+                <button class="reset-btn warning" onclick="resetStars()">Reset Stars to 0</button>
+                <button class="reset-btn danger" onclick="resetAll()">Reset Everything</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== HISTORY VIEW ==================== -->
+    <div id="historyView" class="view">
+        <div class="history-header">
+            <div class="history-title">&#127942; Rewards</div>
+            <button class="history-close-btn" onclick="closeHistory()">&#10005;</button>
+        </div>
+        <div class="history-scroll">
+            <div class="history-stat">
+                <div class="history-stat-number" id="historyTotalStars">0</div>
+                <div class="history-stat-label">Total Stars Earned</div>
+            </div>
+            <div class="history-rewards">
+                <div class="history-stat">
+                    <div class="history-stat-number" id="historyRewards">0</div>
+                    <div class="history-stat-label">&#127851; Rewards Claimed</div>
+                </div>
+                <div class="history-stat">
+                    <div class="history-stat-number" id="historyTasks">0</div>
+                    <div class="history-stat-label">&#9989; Tasks Done Today</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PARENT GATE ==================== -->
+    <div class="parent-gate-overlay" id="parentGate">
+        <div class="parent-gate-box">
+            <div class="parent-gate-title">Parent Area</div>
+            <div class="parent-gate-subtitle">Hold the button for 3 seconds</div>
+            <button class="hold-button" id="holdButton">
+                &#128274;
+                <svg class="hold-progress" viewBox="0 0 108 108">
+                    <circle class="bg" cx="54" cy="54" r="50"/>
+                    <circle class="fg" id="holdProgressCircle" cx="54" cy="54" r="50"/>
+                </svg>
+            </button>
+            <button class="parent-gate-cancel" onclick="closeParentGate()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ==================== UNDO TOAST ==================== -->
+    <div class="undo-toast" id="undoToast">
+        <span id="undoText">Task completed</span>
+        <button class="undo-btn" onclick="undoLastTask()">Undo</button>
+    </div>
+
+    <script>
+        // ==================== DEFAULT TASKS ====================
+        const DEFAULT_TASKS = [
+            { label: "Brush teeth", emoji: "\u{1FAA5}" },
+            { label: "Wash face", emoji: "\u{1F4A6}" },
+            { label: "Get dressed", emoji: "\u{1F455}" },
+            { label: "Comb hair", emoji: "\u{1F487}" },
+            { label: "Make the bed", emoji: "\u{1F6CF}\uFE0F" },
+            { label: "Eat breakfast", emoji: "\u{1F95E}" },
+            { label: "Wash hands", emoji: "\u{1F9FC}" },
+            { label: "Take a bath", emoji: "\u{1F6C1}" },
+            { label: "Use tissue", emoji: "\u{1F927}" },
+            { label: "Put on shoes", emoji: "\u{1F45F}" },
+            { label: "Use toilet", emoji: "\u{1F6BD}" },
+            { label: "Wear pyjamas", emoji: "\u{1F319}" },
+            { label: "Pick up toys", emoji: "\u{1F9F8}" },
+            { label: "Dirty clothes in basket", emoji: "\u{1F9FA}" },
+            { label: "Help set table", emoji: "\u{1F37D}\uFE0F" },
+            { label: "Help clear table", emoji: "\u{1F959}" },
+            { label: "Put books away", emoji: "\u{1F4DA}" },
+            { label: "Help carry bags", emoji: "\u{1F6CD}\uFE0F" },
+            { label: "Eat veggies", emoji: "\u{1F966}" },
+            { label: "Drink water", emoji: "\u{1F4A7}" },
+            { label: "Eat nicely", emoji: "\u{1F60B}" },
+            { label: "Try new food", emoji: "\u{1F372}" },
+            { label: "Say please & thanks", emoji: "\u{1F64F}" },
+            { label: "Share with others", emoji: "\u{1F91D}" },
+            { label: "Be gentle", emoji: "\u{1F49B}" },
+            { label: "Listen to Mum & Dad", emoji: "\u{1F442}" },
+            { label: "Stay calm", emoji: "\u{1F60A}" },
+            { label: "Read a book", emoji: "\u{1F4D6}" },
+            { label: "Draw a picture", emoji: "\u{1F3A8}" },
+            { label: "Go to bed on time", emoji: "\u{1F634}" }
+        ];
+
+        // ==================== REWARD OPTIONS ====================
+        const REWARD_OPTIONS = [
+            { id: "chocolate", emoji: "\u{1F36B}", name: "Chocolate", desc: "A yummy sweet treat!", message: "Time for chocolate!" },
+            { id: "tv", emoji: "\u{1F4FA}", name: "10 min TV", desc: "Watch your favourite show!", message: "Time for TV!" },
+            { id: "cuddle", emoji: "\u{1F917}", name: "Cuddle with Mama", desc: "Big warm cuddle time!", message: "Time for a big cuddle!" },
+            { id: "trampoline", emoji: "\u{1F938}", name: "Trampoline!", desc: "Jump jump jump!", message: "Time to jump!" },
+            { id: "book", emoji: "\u{1F4D6}", name: "Story Time", desc: "Mama or Dad reads a book!", message: "Time for a story!" }
+        ];
+
+        const PRAISE_WORDS = [
+            "Great job!", "Super!", "Awesome!", "Yay!", "Fantastic!",
+            "Well done!", "Brilliant!", "You rock!", "Star!", "Amazing!",
+            "Way to go!", "Superstar!", "Wonderful!", "Hooray!", "Terrific!"
+        ];
+
+        // ==================== STATE ====================
+        const STORAGE_KEY = "paulBearStarApp";
+        let state = loadState();
+        let lastCompletedTaskId = null;
+        let undoTimer = null;
+        let audioContext = null;
+
+        function getDefaultState() {
+            return {
+                version: "1.1",
+                stars: 0,
+                targetStars: 30,
+                totalStarsEarned: 0,
+                totalRewardsEarned: 0,
+                soundEnabled: true,
+                selectedRewardId: null,
+                tasks: DEFAULT_TASKS.map((t, i) => ({
+                    id: "task-" + String(i + 1).padStart(3, "0"),
+                    label: t.label,
+                    emoji: t.emoji,
+                    completed: false
+                }))
+            };
+        }
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // ensure all fields exist
+                    if (!parsed.tasks || !parsed.version) return getDefaultState();
+                    if (parsed.totalStarsEarned === undefined) parsed.totalStarsEarned = 0;
+                    if (parsed.totalRewardsEarned === undefined) parsed.totalRewardsEarned = 0;
+                    if (parsed.soundEnabled === undefined) parsed.soundEnabled = true;
+                    if (parsed.selectedRewardId === undefined) parsed.selectedRewardId = null;
+                    return parsed;
+                }
+            } catch (e) {
+                console.warn("Failed to load state:", e);
+            }
+            return getDefaultState();
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.warn("Failed to save state:", e);
+            }
+        }
+
+        // ==================== SOUND ====================
+        function initAudio() {
+            if (audioContext) return;
+            try {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AC();
+            } catch (e) {
+                console.warn("Audio not supported");
+            }
+        }
+
+        function playNote(freq, duration, type, startTime, volume) {
+            if (!audioContext || !state.soundEnabled) return;
+            if (audioContext.state === "suspended") audioContext.resume();
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = type || "sine";
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(volume || 0.2, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        }
+
+        function playTaskCompleteSound() {
+            if (!audioContext || !state.soundEnabled) return;
+            const now = audioContext.currentTime;
+            // Happy ascending arpeggio
+            playNote(523, 0.15, "triangle", now, 0.25);        // C5
+            playNote(659, 0.15, "triangle", now + 0.08, 0.25);  // E5
+            playNote(784, 0.2, "triangle", now + 0.16, 0.25);   // G5
+            playNote(1047, 0.3, "sine", now + 0.24, 0.2);       // C6
+        }
+
+        function playCelebrationSound() {
+            if (!audioContext || !state.soundEnabled) return;
+            const now = audioContext.currentTime;
+            // Triumphant fanfare
+            const notes = [
+                [523, 0.2, 0], [523, 0.15, 0.2], [523, 0.15, 0.35],
+                [659, 0.2, 0.5], [784, 0.3, 0.7], [1047, 0.5, 1.0],
+                [988, 0.15, 1.3], [1047, 0.6, 1.5]
+            ];
+            notes.forEach(([freq, dur, delay]) => {
+                playNote(freq, dur, "square", now + delay, 0.15);
+                playNote(freq * 1.5, dur, "sine", now + delay, 0.08);
+            });
+        }
+
+        // ==================== CONFETTI ====================
+        let confettiParticles = [];
+        let confettiAnimFrame = null;
+
+        function startConfetti() {
+            const canvas = document.getElementById("confettiCanvas");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const ctx = canvas.getContext("2d");
+            const colors = ["#FF6B6B", "#4ECDC4", "#FFE66D", "#FF8C42", "#A8E6CF", "#FF69B4", "#7B68EE", "#FFD700"];
+
+            confettiParticles = [];
+            for (let i = 0; i < 120; i++) {
+                confettiParticles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: Math.random() * 3 + 1.5,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rotation: Math.random() * 360,
+                    rotSpeed: (Math.random() - 0.5) * 8,
+                    shape: Math.random() > 0.5 ? "rect" : "circle"
+                });
+            }
+
+            function animateConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                confettiParticles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.04;
+                    p.rotation += p.rotSpeed;
+
+                    if (p.y > canvas.height + 20) {
+                        p.y = -10;
+                        p.x = Math.random() * canvas.width;
+                        p.vy = Math.random() * 3 + 1.5;
+                    }
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+
+                    if (p.shape === "rect") {
+                        ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                    } else {
+                        ctx.beginPath();
+                        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                });
+
+                confettiAnimFrame = requestAnimationFrame(animateConfetti);
+            }
+
+            animateConfetti();
+        }
+
+        function stopConfetti() {
+            if (confettiAnimFrame) {
+                cancelAnimationFrame(confettiAnimFrame);
+                confettiAnimFrame = null;
+            }
+            confettiParticles = [];
+            const canvas = document.getElementById("confettiCanvas");
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // ==================== VIEW MANAGEMENT ====================
+        function showView(viewId) {
+            document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+            document.getElementById(viewId).classList.add("active");
+        }
+
+        // ==================== RENDER ====================
+        function render() {
+            // Star count
+            document.getElementById("starCount").textContent = state.stars;
+            document.getElementById("starTarget").textContent = "/ " + state.targetStars;
+
+            // Progress bar
+            const progress = Math.min((state.stars / state.targetStars) * 100, 100);
+            document.getElementById("progressFill").style.width = progress + "%";
+
+            // Reward info
+            const reward = getSelectedReward();
+            const remaining = state.targetStars - state.stars;
+            if (remaining > 0) {
+                document.getElementById("progressText").textContent = remaining + " more star" + (remaining !== 1 ? "s" : "") + " to earn";
+            } else {
+                document.getElementById("progressText").textContent = "Ready to claim";
+            }
+            document.getElementById("progressRewardIcon").textContent = reward.emoji;
+
+            // Reward badge
+            document.getElementById("badgeEmoji").textContent = reward.emoji;
+            document.getElementById("badgeLabel").textContent = reward.name;
+
+            // Task grid
+            renderTaskGrid();
+
+            // Settings
+            document.getElementById("thresholdDisplay").textContent = state.targetStars;
+            document.getElementById("thresholdSlider").value = state.targetStars;
+
+            const soundToggle = document.getElementById("soundToggle");
+            soundToggle.classList.toggle("on", state.soundEnabled);
+
+            // History
+            document.getElementById("historyTotalStars").textContent = state.totalStarsEarned;
+            document.getElementById("historyRewards").textContent = state.totalRewardsEarned;
+            const todayDone = state.tasks.filter(t => t.completed).length;
+            document.getElementById("historyTasks").textContent = todayDone;
+        }
+
+        function renderTaskGrid() {
+            const grid = document.getElementById("taskGrid");
+            grid.innerHTML = "";
+
+            state.tasks.forEach(task => {
+                const card = document.createElement("div");
+                card.className = "task-card" + (task.completed ? " completed" : "");
+                card.innerHTML =
+                    '<div class="task-check">&#10003;</div>' +
+                    '<div class="task-emoji">' + task.emoji + '</div>' +
+                    '<div class="task-label">' + escapeHtml(task.label) + '</div>';
+
+                card.addEventListener("click", () => {
+                    initAudio();
+                    if (!task.completed) {
+                        completeTask(task.id);
+                    }
+                });
+
+                grid.appendChild(card);
+            });
+        }
+
+        function renderTaskManageList() {
+            const list = document.getElementById("taskListManage");
+            list.innerHTML = "";
+
+            state.tasks.forEach(task => {
+                const item = document.createElement("div");
+                item.className = "task-manage-item";
+                item.innerHTML =
+                    '<div class="task-manage-emoji">' + task.emoji + '</div>' +
+                    '<div class="task-manage-label">' + escapeHtml(task.label) + '</div>' +
+                    '<button class="task-manage-delete" data-id="' + task.id + '">&#10005;</button>';
+
+                item.querySelector(".task-manage-delete").addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    deleteTask(task.id);
+                });
+
+                list.appendChild(item);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== REWARD PICKER ====================
+        function getSelectedReward() {
+            if (state.selectedRewardId) {
+                const found = REWARD_OPTIONS.find(r => r.id === state.selectedRewardId);
+                if (found) return found;
+            }
+            return REWARD_OPTIONS[0]; // default to chocolate
+        }
+
+        function showRewardPicker() {
+            initAudio();
+            renderRewardOptions();
+            showView("rewardPickerView");
+        }
+
+        function renderRewardOptions() {
+            const container = document.getElementById("rewardOptions");
+            container.innerHTML = "";
+
+            REWARD_OPTIONS.forEach(reward => {
+                const option = document.createElement("div");
+                option.className = "reward-option" + (state.selectedRewardId === reward.id ? " selected" : "");
+                option.innerHTML =
+                    '<div class="reward-option-emoji">' + reward.emoji + '</div>' +
+                    '<div class="reward-option-info">' +
+                        '<div class="reward-option-name">' + escapeHtml(reward.name) + '</div>' +
+                        '<div class="reward-option-desc">' + escapeHtml(reward.desc) + '</div>' +
+                    '</div>';
+
+                option.addEventListener("click", () => {
+                    selectReward(reward.id);
+                });
+
+                container.appendChild(option);
+            });
+        }
+
+        function selectReward(rewardId) {
+            state.selectedRewardId = rewardId;
+            saveState();
+            playTaskCompleteSound();
+
+            // Brief visual feedback then go to main
+            renderRewardOptions();
+            setTimeout(() => {
+                showView("mainView");
+                render();
+            }, 300);
+        }
+
+        // ==================== TASK ACTIONS ====================
+        function completeTask(taskId) {
+            const task = state.tasks.find(t => t.id === taskId);
+            if (!task || task.completed) return;
+
+            task.completed = true;
+            state.stars++;
+            state.totalStarsEarned++;
+            saveState();
+
+            // Show feedback
+            lastCompletedTaskId = taskId;
+            showStarPopup(task);
+
+            // Check if target reached
+            if (state.stars >= state.targetStars) {
+                setTimeout(() => {
+                    showCelebration();
+                }, 1200);
+            } else {
+                showUndoToast(task.label);
+            }
+        }
+
+        function showStarPopup(task) {
+            const overlay = document.getElementById("starOverlay");
+            const praise = PRAISE_WORDS[Math.floor(Math.random() * PRAISE_WORDS.length)];
+            document.getElementById("popupText").textContent = praise;
+            document.getElementById("popupSubtext").textContent = "+1 Star! (" + state.stars + "/" + state.targetStars + ")";
+
+            overlay.classList.add("active");
+            playTaskCompleteSound();
+
+            render();
+
+            setTimeout(() => {
+                overlay.classList.remove("active");
+            }, 1100);
+        }
+
+        function showUndoToast(taskLabel) {
+            clearTimeout(undoTimer);
+            const toast = document.getElementById("undoToast");
+            document.getElementById("undoText").textContent = taskLabel + " done!";
+            toast.classList.add("active");
+
+            undoTimer = setTimeout(() => {
+                toast.classList.remove("active");
+                lastCompletedTaskId = null;
+            }, 5000);
+        }
+
+        function undoLastTask() {
+            if (!lastCompletedTaskId) return;
+
+            const task = state.tasks.find(t => t.id === lastCompletedTaskId);
+            if (task) {
+                task.completed = false;
+                state.stars = Math.max(0, state.stars - 1);
+                state.totalStarsEarned = Math.max(0, state.totalStarsEarned - 1);
+                saveState();
+                render();
+            }
+
+            clearTimeout(undoTimer);
+            document.getElementById("undoToast").classList.remove("active");
+            lastCompletedTaskId = null;
+        }
+
+        // ==================== CELEBRATION ====================
+        function showCelebration() {
+            const reward = getSelectedReward();
+            document.getElementById("celebRewardEmoji").textContent = reward.emoji;
+            document.getElementById("celebRewardMessage").textContent = reward.message;
+
+            showView("celebrationView");
+            startConfetti();
+            playCelebrationSound();
+
+            const bearAvatar = document.getElementById("bearAvatar");
+            bearAvatar.classList.add("celebrating");
+        }
+
+        function claimReward() {
+            state.totalRewardsEarned++;
+            state.stars = 0;
+            state.selectedRewardId = null;
+            state.tasks.forEach(t => t.completed = false);
+            saveState();
+
+            stopConfetti();
+            document.getElementById("bearAvatar").classList.remove("celebrating");
+
+            // Show reward picker for next round
+            showRewardPicker();
+        }
+
+        // ==================== NEW DAY ====================
+        function resetToday() {
+            if (state.tasks.every(t => !t.completed) && state.stars === 0) return;
+
+            // Keep stars but reset task completion
+            state.tasks.forEach(t => t.completed = false);
+            saveState();
+            render();
+        }
+
+        // ==================== PARENT GATE ====================
+        let holdTimer = null;
+        let holdStartTime = 0;
+        let holdAnimFrame = null;
+
+        function showParentGate() {
+            document.getElementById("parentGate").classList.add("active");
+            setupHoldButton();
+        }
+
+        function closeParentGate() {
+            document.getElementById("parentGate").classList.remove("active");
+            cancelHold();
+        }
+
+        function setupHoldButton() {
+            const btn = document.getElementById("holdButton");
+            const circle = document.getElementById("holdProgressCircle");
+            const circumference = 2 * Math.PI * 50; // r=50
+            circle.style.strokeDasharray = circumference;
+            circle.style.strokeDashoffset = circumference;
+
+            function startHold(e) {
+                e.preventDefault();
+                holdStartTime = Date.now();
+                circle.style.transition = "none";
+                circle.style.strokeDashoffset = circumference;
+
+                animateHold();
+
+                holdTimer = setTimeout(() => {
+                    cancelAnimationFrame(holdAnimFrame);
+                    closeParentGate();
+                    openSettings();
+                }, 3000);
+            }
+
+            function animateHold() {
+                const elapsed = Date.now() - holdStartTime;
+                const progress = Math.min(elapsed / 3000, 1);
+                circle.style.strokeDashoffset = circumference * (1 - progress);
+
+                if (progress < 1) {
+                    holdAnimFrame = requestAnimationFrame(animateHold);
+                }
+            }
+
+            function endHold(e) {
+                e.preventDefault();
+                cancelHold();
+            }
+
+            btn.removeEventListener("touchstart", startHold);
+            btn.removeEventListener("mousedown", startHold);
+            btn.removeEventListener("touchend", endHold);
+            btn.removeEventListener("mouseup", endHold);
+            btn.removeEventListener("touchcancel", endHold);
+            btn.removeEventListener("mouseleave", endHold);
+
+            btn.addEventListener("touchstart", startHold, { passive: false });
+            btn.addEventListener("mousedown", startHold);
+            btn.addEventListener("touchend", endHold, { passive: false });
+            btn.addEventListener("mouseup", endHold);
+            btn.addEventListener("touchcancel", endHold, { passive: false });
+            btn.addEventListener("mouseleave", endHold);
+        }
+
+        function cancelHold() {
+            clearTimeout(holdTimer);
+            cancelAnimationFrame(holdAnimFrame);
+            const circle = document.getElementById("holdProgressCircle");
+            const circumference = 2 * Math.PI * 50;
+            circle.style.strokeDashoffset = circumference;
+        }
+
+        // ==================== SETTINGS ====================
+        function openSettings() {
+            renderTaskManageList();
+            showView("settingsView");
+        }
+
+        function closeSettings() {
+            showView("mainView");
+            render();
+        }
+
+        function updateThreshold(value) {
+            state.targetStars = parseInt(value);
+            document.getElementById("thresholdDisplay").textContent = value;
+            saveState();
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            saveState();
+            document.getElementById("soundToggle").classList.toggle("on", state.soundEnabled);
+
+            if (state.soundEnabled) {
+                initAudio();
+                playTaskCompleteSound();
+            }
+        }
+
+        function addNewTask() {
+            const emojiInput = document.getElementById("newTaskEmoji");
+            const labelInput = document.getElementById("newTaskLabel");
+
+            const emoji = emojiInput.value.trim() || "\u2B50";
+            const label = labelInput.value.trim();
+
+            if (!label) {
+                labelInput.focus();
+                return;
+            }
+
+            const newId = "task-" + Date.now();
+            state.tasks.push({
+                id: newId,
+                label: label,
+                emoji: emoji,
+                completed: false
+            });
+
+            saveState();
+            renderTaskManageList();
+
+            emojiInput.value = "";
+            labelInput.value = "";
+            labelInput.focus();
+        }
+
+        function deleteTask(taskId) {
+            state.tasks = state.tasks.filter(t => t.id !== taskId);
+            saveState();
+            renderTaskManageList();
+        }
+
+        function resetStars() {
+            if (confirm("Reset Paul's stars to 0?")) {
+                state.stars = 0;
+                state.tasks.forEach(t => t.completed = false);
+                saveState();
+                render();
+            }
+        }
+
+        function resetAll() {
+            if (confirm("This will delete ALL data and tasks. Are you sure?")) {
+                state = getDefaultState();
+                saveState();
+                render();
+                renderTaskManageList();
+                closeSettings();
+                showRewardPicker();
+            }
+        }
+
+        // ==================== HISTORY ====================
+        function showHistory() {
+            render();
+            showView("historyView");
+        }
+
+        function closeHistory() {
+            showView("mainView");
+        }
+
+        // ==================== INIT ====================
+        function init() {
+            render();
+
+            // Show reward picker if no reward selected
+            if (!state.selectedRewardId) {
+                showRewardPicker();
+            }
+
+            // First interaction enables audio
+            document.addEventListener("touchstart", () => initAudio(), { once: true });
+            document.addEventListener("click", () => initAudio(), { once: true });
+
+            // Handle resize for confetti
+            window.addEventListener("resize", () => {
+                const canvas = document.getElementById("confettiCanvas");
+                if (canvas && confettiAnimFrame) {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+            });
+        }
+
+        // ==================== SERVICE WORKER ====================
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("sw.js").catch(() => {
+                // SW not available, app still works
+            });
+        }
+
+        // Start app
+        init();
+    </script>
+</body>
+</html>
