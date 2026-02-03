@@ -1,4 +1,4 @@
-const CACHE_NAME = "paul-bear-stars-v1";
+const CACHE_NAME = "paul-bear-stars-v2";
 const urlsToCache = [
     "./",
     "./index.html"
