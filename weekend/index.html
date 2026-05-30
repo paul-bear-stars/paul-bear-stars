@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Weekend with Friends</title>
+<meta name="description" content="Four days, good friends, and the moments worth keeping." />
+
+<!-- Fonts: elegant serif display + clean sans body -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  /* ============================================================
+     THEME — edit these to recolour the whole site
+     ============================================================ */
+  :root{
+    --bg:        #f6f1e9;   /* warm paper */
+    --bg-soft:   #efe7da;   /* slightly deeper paper */
+    --ink:       #2b2622;   /* near-black warm brown */
+    --ink-soft:  #6f655b;   /* muted body text */
+    --line:      #ddd2c2;   /* hairlines */
+    --accent:    #b08145;   /* warm gold / terracotta */
+    --accent-d:  #8a6233;
+    --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --sans:  "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --maxw: 1180px;
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-weight:300;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{ max-width:100%; display:block; }
+  a{ color:inherit; }
+
+  /* ============================================================
+     NAV
+     ============================================================ */
+  header.nav{
+    position:fixed; inset:0 0 auto 0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px clamp(20px,5vw,56px);
+    transition:background .45s var(--ease), padding .45s var(--ease), box-shadow .45s var(--ease);
+    mix-blend-mode:normal;
+  }
+  header.nav.scrolled{
+    background:rgba(246,241,233,.92);
+    backdrop-filter:saturate(140%) blur(10px);
+    padding:14px clamp(20px,5vw,56px);
+    box-shadow:0 1px 0 var(--line);
+  }
+  .brand{
+    font-family:var(--serif);
+    font-size:1.35rem; letter-spacing:.06em;
+    color:#fff; text-decoration:none; transition:color .45s var(--ease);
+  }
+  header.nav.scrolled .brand{ color:var(--ink); }
+  nav.links{ display:flex; gap:clamp(14px,2.4vw,34px); }
+  nav.links a{
+    font-size:.74rem; letter-spacing:.22em; text-transform:uppercase;
+    text-decoration:none; color:rgba(255,255,255,.85);
+    position:relative; padding:4px 0; transition:color .45s var(--ease);
+  }
+  header.nav.scrolled nav.links a{ color:var(--ink-soft); }
+  nav.links a::after{
+    content:""; position:absolute; left:0; bottom:0; height:1px; width:0;
+    background:var(--accent); transition:width .35s var(--ease);
+  }
+  nav.links a:hover{ color:var(--accent); }
+  nav.links a:hover::after{ width:100%; }
+  @media (max-width:680px){ nav.links{ display:none; } }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero{
+    position:relative; height:100vh; min-height:560px;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; color:#fff; overflow:hidden;
+  }
+  .hero .bg{
+    position:absolute; inset:-8% 0 0 0; z-index:0;
+    background:
+      linear-gradient(180deg, rgba(20,16,12,.45), rgba(20,16,12,.25) 40%, rgba(20,16,12,.65)),
+      linear-gradient(135deg,#6b5640,#b08145 55%,#7d6a52);
+    /* placeholder gradient — replaced by your hero photo below */
+    background-color:#5c4a38;
+    background-size:cover; background-position:center;
+    will-change:transform;
+  }
+  /* When you add a hero photo, set it here: */
+  .hero.has-photo .bg{
+    background:
+      linear-gradient(180deg, rgba(20,16,12,.45), rgba(20,16,12,.2) 40%, rgba(20,16,12,.7)),
+      var(--hero-img) center/cover no-repeat;
+  }
+  .hero .inner{ position:relative; z-index:2; padding:0 24px; max-width:900px; }
+  .hero .kicker{
+    font-size:.78rem; letter-spacing:.42em; text-transform:uppercase;
+    opacity:0; transform:translateY(14px); animation:rise .9s var(--ease) .2s forwards;
+  }
+  .hero h1{
+    font-family:var(--serif); font-weight:500;
+    font-size:clamp(3rem,9vw,7rem); line-height:1.02; margin:.18em 0 .12em;
+    letter-spacing:.01em;
+    opacity:0; transform:translateY(22px); animation:rise 1s var(--ease) .35s forwards;
+  }
+  .hero .dates{
+    font-size:clamp(.95rem,2.2vw,1.15rem); letter-spacing:.18em; font-weight:300;
+    opacity:0; transform:translateY(16px); animation:rise 1s var(--ease) .55s forwards;
+  }
+  .hero .dates span{ color:var(--accent); }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+
+  .scrollcue{
+    position:absolute; left:50%; bottom:32px; transform:translateX(-50%);
+    z-index:2; display:flex; flex-direction:column; align-items:center; gap:10px;
+    color:#fff; font-size:.62rem; letter-spacing:.3em; text-transform:uppercase;
+    opacity:0; animation:rise 1s var(--ease) 1s forwards;
+  }
+  .scrollcue .line{ width:1px; height:46px; background:rgba(255,255,255,.6); position:relative; overflow:hidden; }
+  .scrollcue .line::after{ content:""; position:absolute; inset:0; background:#fff; animation:drop 2.2s var(--ease) infinite; }
+  @keyframes drop{ 0%{ transform:translateY(-100%);} 60%,100%{ transform:translateY(100%);} }
+
+  /* ============================================================
+     LAYOUT PRIMITIVES
+     ============================================================ */
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 clamp(20px,5vw,40px); }
+  section{ position:relative; }
+
+  .intro{ padding:clamp(90px,14vw,170px) 0 clamp(40px,8vw,90px); text-align:center; }
+  .intro .lead{
+    font-family:var(--serif); font-style:italic;
+    font-size:clamp(1.5rem,3.4vw,2.4rem); line-height:1.45; color:var(--ink);
+    max-width:760px; margin:0 auto;
+  }
+  .intro p.sub{ max-width:620px; margin:1.6em auto 0; color:var(--ink-soft); }
+
+  /* Day marker */
+  .day-head{ text-align:center; padding:clamp(60px,10vw,120px) 0 clamp(30px,5vw,50px); }
+  .day-head .no{
+    font-size:.74rem; letter-spacing:.4em; text-transform:uppercase; color:var(--accent-d);
+  }
+  .day-head h2{
+    font-family:var(--serif); font-weight:500; margin:.25em 0 .15em;
+    font-size:clamp(2.2rem,6vw,4rem); line-height:1.05;
+  }
+  .day-head .meta{ color:var(--ink-soft); font-size:.92rem; letter-spacing:.04em; }
+  .day-head .rule{ width:54px; height:1px; background:var(--accent); margin:26px auto 0; }
+
+  .narrative{ max-width:680px; margin:0 auto; text-align:center; color:var(--ink-soft); padding:0 0 clamp(30px,6vw,56px); }
+  .narrative p{ margin:0 0 1.1em; }
+
+  /* Photo grids */
+  figure{ margin:0; position:relative; overflow:hidden; background:var(--bg-soft); }
+  figure img{ width:100%; height:100%; object-fit:cover; transition:transform 1.1s var(--ease); }
+  figure:hover img{ transform:scale(1.04); }
+  figcaption{
+    position:absolute; left:0; right:0; bottom:0;
+    padding:26px 22px 16px; color:#fff; font-size:.82rem; letter-spacing:.04em;
+    background:linear-gradient(transparent, rgba(15,11,8,.7));
+    opacity:0; transform:translateY(8px); transition:opacity .5s var(--ease), transform .5s var(--ease);
+  }
+  figure:hover figcaption{ opacity:1; transform:none; }
+
+  .full{ height:clamp(360px,72vh,720px); margin:8px 0; }
+  .grid{ display:grid; gap:10px; margin:10px 0; }
+  .g-2{ grid-template-columns:1fr 1fr; }
+  .g-3{ grid-template-columns:repeat(3,1fr); }
+  .g-2 figure{ height:clamp(280px,46vh,520px); }
+  .g-3 figure{ height:clamp(220px,34vh,420px); }
+  .split{ display:grid; grid-template-columns:1.15fr .85fr; gap:clamp(24px,5vw,64px); align-items:center; margin:10px 0; padding:clamp(20px,5vw,40px) 0; }
+  .split.flip{ grid-template-columns:.85fr 1.15fr; }
+  .split .txt h3{ font-family:var(--serif); font-weight:500; font-size:clamp(1.6rem,3.6vw,2.4rem); margin:0 0 .4em; line-height:1.1; }
+  .split .txt p{ color:var(--ink-soft); margin:0; }
+  .split figure{ height:clamp(320px,56vh,560px); }
+  @media (max-width:760px){
+    .g-3{ grid-template-columns:1fr 1fr; }
+    .split,.split.flip{ grid-template-columns:1fr; }
+    .split .txt{ order:2; }
+  }
+  @media (max-width:480px){
+    .g-2,.g-3{ grid-template-columns:1fr; }
+  }
+
+  /* Placeholder tile look (used until you add photos) */
+  .ph{
+    background:
+      radial-gradient(120% 120% at 30% 20%, rgba(255,255,255,.18), transparent 55%),
+      linear-gradient(135deg,#cdb79c,#a98a63 60%,#7d684e);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .ph::before{
+    content:attr(data-label);
+    color:rgba(255,255,255,.92); font-size:.72rem; letter-spacing:.26em; text-transform:uppercase;
+    border:1px solid rgba(255,255,255,.55); padding:9px 16px; border-radius:999px;
+    backdrop-filter:blur(1px);
+  }
+  .ph:nth-of-type(2n){ background:linear-gradient(135deg,#c2a98a,#9c7e5c 60%,#6f5c45); }
+  .ph:nth-of-type(3n){ background:linear-gradient(135deg,#d2c0a4,#b0926c 60%,#836b50); }
+
+  /* Pull quote between days */
+  .quote{ padding:clamp(70px,12vw,140px) 0; text-align:center; }
+  .quote blockquote{
+    font-family:var(--serif); font-style:italic; font-weight:400;
+    font-size:clamp(1.8rem,4.6vw,3.1rem); line-height:1.35; margin:0 auto; max-width:880px; color:var(--ink);
+  }
+  .quote cite{ display:block; margin-top:1.2em; font-style:normal; font-family:var(--sans);
+    font-size:.74rem; letter-spacing:.3em; text-transform:uppercase; color:var(--accent-d); }
+
+  /* Closing */
+  .closing{ text-align:center; padding:clamp(90px,15vw,180px) 0 clamp(60px,10vw,110px); }
+  .closing .no{ font-size:.74rem; letter-spacing:.4em; text-transform:uppercase; color:var(--accent-d); }
+  .closing h2{ font-family:var(--serif); font-weight:500; font-size:clamp(2.4rem,7vw,4.6rem); margin:.2em 0; }
+  .closing p{ max-width:560px; margin:0 auto; color:var(--ink-soft); }
+
+  footer{ border-top:1px solid var(--line); padding:46px 0 60px; text-align:center; color:var(--ink-soft); font-size:.82rem; letter-spacing:.06em; }
+  footer .top{ display:inline-block; margin-bottom:18px; font-size:.7rem; letter-spacing:.28em; text-transform:uppercase; text-decoration:none; color:var(--ink); border-bottom:1px solid var(--accent); padding-bottom:4px; }
+  footer .top:hover{ color:var(--accent); }
+
+  /* ============================================================
+     SCROLL REVEAL
+     ============================================================ */
+  .reveal{ opacity:0; transform:translateY(34px); transition:opacity 1s var(--ease), transform 1s var(--ease); }
+  .reveal.in{ opacity:1; transform:none; }
+  .reveal.d1{ transition-delay:.12s; }
+  .reveal.d2{ transition-delay:.24s; }
+  .reveal.d3{ transition-delay:.36s; }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; }
+    .reveal{ opacity:1; transform:none; }
+    html{ scroll-behavior:auto; }
+  }
+
+  /* ============================================================
+     LIGHTBOX
+     ============================================================ */
+  .lb{ position:fixed; inset:0; z-index:100; background:rgba(18,13,9,.94); display:none; align-items:center; justify-content:center; padding:4vw; cursor:zoom-out; }
+  .lb.open{ display:flex; }
+  .lb img{ max-width:92vw; max-height:90vh; object-fit:contain; box-shadow:0 30px 80px rgba(0,0,0,.5); }
+  .lb .close{ position:absolute; top:22px; right:28px; color:#fff; font-size:2rem; cursor:pointer; line-height:1; opacity:.8; }
+  .lb .close:hover{ opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav" id="nav">
+  <a class="brand" href="#top">A Weekend with Friends</a>
+  <nav class="links">
+    <a href="#day1">Day One</a>
+    <a href="#day2">Day Two</a>
+    <a href="#day3">Day Three</a>
+    <a href="#day4">Day Four</a>
+  </nav>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="top">
+  <!-- To add a hero photo: add class "has-photo" to .hero and set --hero-img below,
+       e.g. style="--hero-img:url('photos/hero.jpg')" -->
+  <div class="bg" id="heroBg"></div>
+  <div class="inner">
+    <div class="kicker">A long weekend · Four days</div>
+    <h1>A Weekend<br>with Friends</h1>
+    <div class="dates"><span>Day One</span> — <span>Day Four</span> &nbsp;·&nbsp; Edit the dates &amp; place here</div>
+  </div>
+  <div class="scrollcue"><span>Scroll</span><span class="line"></span></div>
+</section>
+
+<!-- ===================== INTRO ===================== -->
+<section class="intro wrap">
+  <p class="lead reveal">Some weekends you remember for a week. This one we’ll remember for years — four days, the people who matter, and all the small moments in between.</p>
+  <p class="sub reveal d1">Replace this with a short introduction: who came, where you went, and why this weekend was worth a whole website. A sentence or two is plenty.</p>
+</section>
+
+<!-- ===================== DAY 1 ===================== -->
+<section id="day1">
+  <div class="day-head wrap">
+    <div class="no reveal">Day One</div>
+    <h2 class="reveal d1">Arrivals</h2>
+    <div class="meta reveal d1">Add the date · Add the place</div>
+    <div class="rule reveal d2"></div>
+  </div>
+
+  <div class="narrative wrap reveal">
+    <p>Set the scene for the first day. The drive, the first hellos, dropping bags, the first round of drinks. Keep it warm and short — let the photos carry the rest.</p>
+  </div>
+
+  <div class="wrap">
+    <figure class="full ph reveal" data-label="Day 1 · Photo 1"></figure>
+    <div class="grid g-2">
+      <figure class="ph reveal" data-label="Day 1 · Photo 2"></figure>
+      <figure class="ph reveal d1" data-label="Day 1 · Photo 3"></figure>
+    </div>
+    <div class="split">
+      <figure class="ph reveal" data-label="Day 1 · Photo 4"></figure>
+      <div class="txt reveal d1">
+        <h3>The first evening</h3>
+        <p>A little caption-paragraph for a standout moment of day one. Replace with your own words — a story, an inside joke, a place you’d recommend.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== QUOTE ===================== -->
+<section class="quote wrap">
+  <blockquote class="reveal">“A great pull-quote from the weekend goes here — something someone actually said.”</blockquote>
+  <cite class="reveal d1">— who said it</cite>
+</section>
+
+<!-- ===================== DAY 2 ===================== -->
+<section id="day2">
+  <div class="day-head wrap">
+    <div class="no reveal">Day Two</div>
+    <h2 class="reveal d1">The Day Out</h2>
+    <div class="meta reveal d1">Add the date · Add the place</div>
+    <div class="rule reveal d2"></div>
+  </div>
+
+  <div class="narrative wrap reveal">
+    <p>Day two is usually the big one — the hike, the trip, the long lunch. Describe what you did and where, and tee up the gallery below.</p>
+  </div>
+
+  <div class="wrap">
+    <div class="grid g-3">
+      <figure class="ph reveal" data-label="Day 2 · Photo 1"></figure>
+      <figure class="ph reveal d1" data-label="Day 2 · Photo 2"></figure>
+      <figure class="ph reveal d2" data-label="Day 2 · Photo 3"></figure>
+    </div>
+    <figure class="full ph reveal" data-label="Day 2 · Photo 4"></figure>
+    <div class="split flip">
+      <div class="txt reveal">
+        <h3>Somewhere worth it</h3>
+        <p>Caption a highlight of the day here. Replace with your own words.</p>
+      </div>
+      <figure class="ph reveal d1" data-label="Day 2 · Photo 5"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DAY 3 ===================== -->
+<section id="day3">
+  <div class="day-head wrap">
+    <div class="no reveal">Day Three</div>
+    <h2 class="reveal d1">Slow Morning, Long Night</h2>
+    <div class="meta reveal d1">Add the date · Add the place</div>
+    <div class="rule reveal d2"></div>
+  </div>
+
+  <div class="narrative wrap reveal">
+    <p>The lazy day, the cooking, the games, the night that went later than planned. Tell that story here.</p>
+  </div>
+
+  <div class="wrap">
+    <div class="split">
+      <figure class="ph reveal" data-label="Day 3 · Photo 1"></figure>
+      <div class="txt reveal d1">
+        <h3>Around the table</h3>
+        <p>Replace with your own words about a favourite moment of day three.</p>
+      </div>
+    </div>
+    <div class="grid g-2">
+      <figure class="ph reveal" data-label="Day 3 · Photo 2"></figure>
+      <figure class="ph reveal d1" data-label="Day 3 · Photo 3"></figure>
+    </div>
+    <figure class="full ph reveal" data-label="Day 3 · Photo 4"></figure>
+  </div>
+</section>
+
+<!-- ===================== QUOTE ===================== -->
+<section class="quote wrap">
+  <blockquote class="reveal">“Another line that captures the mood of the weekend.”</blockquote>
+  <cite class="reveal d1">— who said it</cite>
+</section>
+
+<!-- ===================== DAY 4 ===================== -->
+<section id="day4">
+  <div class="day-head wrap">
+    <div class="no reveal">Day Four</div>
+    <h2 class="reveal d1">Goodbyes</h2>
+    <div class="meta reveal d1">Add the date · Add the place</div>
+    <div class="rule reveal d2"></div>
+  </div>
+
+  <div class="narrative wrap reveal">
+    <p>The last breakfast, the slow packing up, the “let’s do this again soon.” Wrap the story here.</p>
+  </div>
+
+  <div class="wrap">
+    <figure class="full ph reveal" data-label="Day 4 · Photo 1"></figure>
+    <div class="grid g-3">
+      <figure class="ph reveal" data-label="Day 4 · Photo 2"></figure>
+      <figure class="ph reveal d1" data-label="Day 4 · Photo 3"></figure>
+      <figure class="ph reveal d2" data-label="Day 4 · Photo 4"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CLOSING ===================== -->
+<section class="closing wrap">
+  <div class="no reveal">Until next time</div>
+  <h2 class="reveal d1">The End.</h2>
+  <p class="reveal d2">Four days, one good group of friends. Thanks for the memories — here’s to the next one.</p>
+</section>
+
+<footer>
+  <a class="top" href="#top">Back to top</a>
+  <div>Made with friends · <span id="year"></span></div>
+</footer>
+
+<!-- ===================== LIGHTBOX ===================== -->
+<div class="lb" id="lb"><span class="close">&times;</span><img alt="" id="lbImg" /></div>
+
+<script>
+  // year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // nav background on scroll
+  const nav = document.getElementById('nav');
+  const onScroll = () => { nav.classList.toggle('scrolled', window.scrollY > 60); };
+  onScroll(); window.addEventListener('scroll', onScroll, { passive:true });
+
+  // subtle hero parallax
+  const heroBg = document.getElementById('heroBg');
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if(y < window.innerHeight) heroBg.style.transform = `translateY(${y * 0.35}px) scale(1.06)`;
+    }, { passive:true });
+  }
+
+  // scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold:0.12, rootMargin:'0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // lightbox (works once you add real <img> inside figures)
+  const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg');
+  document.addEventListener('click', (e) => {
+    const img = e.target.closest('figure img');
+    if(img){ lbImg.src = img.currentSrc || img.src; lbImg.alt = img.alt || ''; lb.classList.add('open'); }
+    else if(e.target.closest('#lb')){ lb.classList.remove('open'); lbImg.src=''; }
+  });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape'){ lb.classList.remove('open'); lbImg.src=''; } });
+</script>
+</body>
+</html>
