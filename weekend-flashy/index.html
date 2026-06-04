@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A Weekend with Friends — Flashy</title>
+<meta name="description" content="Four days. The crew. Pure chaos and good light." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --bg:#0c0a18; --bg2:#15102b; --panel:#181233;
+    --ink:#f5f2ff; --muted:#b3a9d6;
+    --c1:#ff5e8a; --c2:#ffb24b; --c3:#5ad1ff; --c4:#9b6cff;
+    --grad:linear-gradient(120deg,var(--c1),var(--c4) 40%,var(--c3) 75%,var(--c2));
+    --disp:"Syne",system-ui,sans-serif;
+    --sans:"Space Grotesk",system-ui,sans-serif;
+    --maxw:1240px;
+    --ease:cubic-bezier(.16,.84,.34,1);
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--sans); font-weight:300; line-height:1.7;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  img{ max-width:100%; display:block; }
+
+  /* cursor glow */
+  .glow{ position:fixed; width:520px; height:520px; left:0; top:0; z-index:0; pointer-events:none;
+    background:radial-gradient(circle, rgba(155,108,255,.22), transparent 60%);
+    transform:translate(-50%,-50%); transition:opacity .4s; mix-blend-mode:screen; }
+
+  /* scroll progress */
+  .progress{ position:fixed; top:0; left:0; height:3px; width:0; z-index:60; background:var(--grad); box-shadow:0 0 18px var(--c4); }
+
+  /* NAV */
+  header.nav{ position:fixed; inset:0 0 auto 0; z-index:50; display:flex; align-items:center; justify-content:space-between;
+    padding:20px clamp(18px,5vw,52px); transition:.45s var(--ease); }
+  header.nav.scrolled{ background:rgba(12,10,24,.72); backdrop-filter:blur(14px) saturate(160%); padding:13px clamp(18px,5vw,52px); border-bottom:1px solid rgba(255,255,255,.08); }
+  .brand{ font-family:var(--disp); font-weight:800; font-size:1.05rem; letter-spacing:.02em; text-decoration:none; color:var(--ink);
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  nav.links{ display:flex; gap:clamp(12px,2vw,30px); }
+  nav.links a{ font-size:.72rem; letter-spacing:.2em; text-transform:uppercase; text-decoration:none; color:var(--muted);
+    position:relative; transition:color .35s; }
+  nav.links a::after{ content:""; position:absolute; left:0; bottom:-5px; height:2px; width:0; background:var(--grad); transition:width .35s var(--ease); }
+  nav.links a:hover{ color:var(--ink); } nav.links a:hover::after{ width:100%; }
+  @media (max-width:700px){ nav.links{ display:none; } }
+
+  /* HERO */
+  .hero{ position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; }
+  .mesh{ position:absolute; inset:-20%; z-index:0; filter:blur(40px); opacity:.9;
+    background:
+      radial-gradient(40% 50% at 20% 30%, var(--c1), transparent 60%),
+      radial-gradient(45% 55% at 80% 25%, var(--c4), transparent 60%),
+      radial-gradient(50% 50% at 60% 80%, var(--c3), transparent 60%),
+      radial-gradient(40% 45% at 25% 75%, var(--c2), transparent 60%);
+    animation:swirl 18s linear infinite alternate; }
+  @keyframes swirl{ 0%{ transform:scale(1) rotate(0); } 100%{ transform:scale(1.25) rotate(14deg); } }
+  .hero .veil{ position:absolute; inset:0; z-index:1; background:radial-gradient(120% 90% at 50% 0%, transparent 30%, rgba(12,10,24,.55) 75%, var(--bg)); }
+  .hero .inner{ position:relative; z-index:3; padding:0 22px; }
+  .hero .kicker{ display:inline-block; font-size:.74rem; letter-spacing:.36em; text-transform:uppercase; color:var(--ink);
+    padding:8px 18px; border:1px solid rgba(255,255,255,.25); border-radius:999px; backdrop-filter:blur(6px);
+    opacity:0; transform:translateY(18px); animation:rise .9s var(--ease) .15s forwards; }
+  .hero h1{ font-family:var(--disp); font-weight:800; font-size:clamp(3.2rem,12vw,9.5rem); line-height:.92; letter-spacing:-.02em;
+    margin:.18em 0 .14em; }
+  .hero h1 .l1{ display:block; opacity:0; transform:translateY(40px); animation:rise 1s var(--ease) .3s forwards; }
+  .hero h1 .l2{ display:block; background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    background-size:200% auto; animation:rise 1s var(--ease) .45s forwards, shine 6s linear infinite; opacity:0; transform:translateY(40px); }
+  @keyframes shine{ to{ background-position:200% center; } }
+  .hero .dates{ font-size:clamp(.95rem,2.4vw,1.2rem); letter-spacing:.18em; color:var(--muted);
+    opacity:0; transform:translateY(16px); animation:rise 1s var(--ease) .65s forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+  .scrollcue{ position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:3; font-size:.62rem; letter-spacing:.3em;
+    text-transform:uppercase; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:8px;
+    opacity:0; animation:rise 1s var(--ease) 1s forwards; }
+  .scrollcue .dot{ width:7px; height:7px; border-radius:50%; background:var(--c3); box-shadow:0 0 14px var(--c3); animation:bob 1.6s var(--ease) infinite; }
+  @keyframes bob{ 50%{ transform:translateY(8px); opacity:.5; } }
+
+  /* MARQUEE */
+  .marquee{ position:relative; z-index:2; overflow:hidden; border-block:1px solid rgba(255,255,255,.1);
+    padding:18px 0; background:var(--bg2); white-space:nowrap; }
+  .marquee .track{ display:inline-block; animation:scrollx 24s linear infinite; }
+  .marquee span{ font-family:var(--disp); font-weight:700; font-size:clamp(1.4rem,4vw,2.4rem); margin:0 .5em; color:transparent;
+    -webkit-text-stroke:1px rgba(255,255,255,.45); }
+  .marquee span.fill{ -webkit-text-stroke:0; background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  @keyframes scrollx{ to{ transform:translateX(-50%); } }
+
+  /* LAYOUT */
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 clamp(18px,5vw,40px); position:relative; z-index:2; }
+  section{ position:relative; z-index:2; }
+
+  .intro{ padding:clamp(90px,14vw,170px) 0 clamp(30px,6vw,70px); text-align:center; }
+  .intro .lead{ font-family:var(--disp); font-weight:700; font-size:clamp(1.8rem,5vw,3.4rem); line-height:1.18; max-width:900px; margin:0 auto; letter-spacing:-.01em; }
+  .intro .lead em{ font-style:normal; background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .intro p.sub{ max-width:620px; margin:1.6em auto 0; color:var(--muted); }
+
+  /* DAY */
+  .day{ padding:clamp(50px,9vw,110px) 0; }
+  .day-head{ position:relative; text-align:center; margin-bottom:clamp(30px,6vw,60px); }
+  .day-head .bignum{ position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); z-index:-1;
+    font-family:var(--disp); font-weight:800; font-size:clamp(11rem,38vw,30rem); line-height:1; color:transparent;
+    -webkit-text-stroke:1.5px rgba(255,255,255,.06); pointer-events:none; user-select:none; }
+  .day-head .no{ font-size:.74rem; letter-spacing:.36em; text-transform:uppercase; color:var(--c3); }
+  .day-head h2{ font-family:var(--disp); font-weight:800; font-size:clamp(2.4rem,7vw,5rem); line-height:1; margin:.2em 0 .18em; letter-spacing:-.02em; }
+  .day-head .meta{ color:var(--muted); font-size:.92rem; letter-spacing:.06em; }
+  .narrative{ max-width:680px; margin:0 auto clamp(28px,5vw,52px); text-align:center; color:var(--muted); }
+
+  figure{ margin:0; position:relative; overflow:hidden; border-radius:18px; background:var(--panel);
+    transform-style:preserve-3d; transition:transform .4s var(--ease), box-shadow .4s var(--ease); }
+  figure:hover{ box-shadow:0 30px 70px -20px rgba(155,108,255,.5); }
+  figure img{ width:100%; height:100%; object-fit:cover; transition:transform 1s var(--ease); }
+  figure:hover img{ transform:scale(1.06); }
+  figcaption{ position:absolute; left:0; right:0; bottom:0; padding:30px 20px 16px; color:#fff; font-size:.84rem; letter-spacing:.02em;
+    background:linear-gradient(transparent, rgba(8,6,18,.82)); opacity:0; transform:translateY(10px); transition:.45s var(--ease); }
+  figure:hover figcaption{ opacity:1; transform:none; }
+
+  .full{ height:clamp(360px,74vh,760px); margin:12px 0; }
+  .grid{ display:grid; gap:14px; margin:14px 0; }
+  .g-2{ grid-template-columns:1fr 1fr; } .g-3{ grid-template-columns:repeat(3,1fr); }
+  .g-2 figure{ height:clamp(280px,48vh,540px); } .g-3 figure{ height:clamp(220px,36vh,440px); }
+  .split{ display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(24px,5vw,60px); align-items:center; margin:14px 0; }
+  .split.flip{ grid-template-columns:.9fr 1.1fr; }
+  .split .txt h3{ font-family:var(--disp); font-weight:700; font-size:clamp(1.7rem,4vw,2.7rem); margin:0 0 .4em; line-height:1.05; letter-spacing:-.01em; }
+  .split .txt h3 em{ font-style:normal; background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .split .txt p{ color:var(--muted); margin:0; }
+  .split figure{ height:clamp(320px,58vh,580px); }
+  @media (max-width:760px){ .g-3{ grid-template-columns:1fr 1fr; } .split,.split.flip{ grid-template-columns:1fr; } .split .txt{ order:2; } }
+  @media (max-width:480px){ .g-2,.g-3{ grid-template-columns:1fr; } }
+
+  /* placeholder tiles */
+  .ph{ display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#2a1f55,#3a2670 50%,#5a2e6e); position:relative; }
+  .ph::after{ content:""; position:absolute; inset:0; background:
+      radial-gradient(60% 80% at 20% 10%, rgba(90,209,255,.35), transparent 55%),
+      radial-gradient(60% 80% at 90% 90%, rgba(255,94,138,.35), transparent 55%); mix-blend-mode:screen; }
+  .ph::before{ content:attr(data-label); position:relative; z-index:1; color:rgba(255,255,255,.92); font-size:.72rem;
+    letter-spacing:.24em; text-transform:uppercase; border:1px solid rgba(255,255,255,.5); padding:9px 16px; border-radius:999px; }
+  .ph:nth-of-type(2n){ background:linear-gradient(135deg,#3a1d4d,#5b2a4e 50%,#7a3a2e); }
+  .ph:nth-of-type(3n){ background:linear-gradient(135deg,#1d2a55,#2a4670 50%,#2e6e63); }
+
+  /* QUOTE */
+  .quote{ padding:clamp(70px,12vw,140px) 0; text-align:center; }
+  .quote blockquote{ font-family:var(--disp); font-weight:700; font-size:clamp(1.9rem,5.2vw,3.4rem); line-height:1.22; margin:0 auto; max-width:920px; letter-spacing:-.01em; }
+  .quote blockquote em{ font-style:normal; background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .quote cite{ display:block; margin-top:1.1em; font-style:normal; font-size:.74rem; letter-spacing:.3em; text-transform:uppercase; color:var(--c2); }
+
+  /* CLOSING */
+  .closing{ position:relative; text-align:center; padding:clamp(100px,16vw,200px) 0; overflow:hidden; }
+  .closing .mesh2{ position:absolute; inset:-30%; z-index:0; filter:blur(60px); opacity:.55;
+    background:radial-gradient(40% 50% at 30% 40%,var(--c1),transparent 60%),radial-gradient(45% 55% at 75% 60%,var(--c4),transparent 60%);
+    animation:swirl 20s linear infinite alternate; }
+  .closing .inner{ position:relative; z-index:2; }
+  .closing .no{ font-size:.74rem; letter-spacing:.36em; text-transform:uppercase; color:var(--c3); }
+  .closing h2{ font-family:var(--disp); font-weight:800; font-size:clamp(2.8rem,10vw,7rem); margin:.18em 0; letter-spacing:-.02em;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; background-size:200% auto; animation:shine 6s linear infinite; }
+  .closing p{ max-width:560px; margin:0 auto; color:var(--muted); }
+
+  footer{ border-top:1px solid rgba(255,255,255,.1); padding:46px 0 60px; text-align:center; color:var(--muted); font-size:.82rem; letter-spacing:.05em; position:relative; z-index:2; }
+  footer .top{ display:inline-block; margin-bottom:16px; font-size:.7rem; letter-spacing:.26em; text-transform:uppercase; text-decoration:none; color:var(--ink); }
+  footer .top span{ background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+
+  .reveal{ opacity:0; transform:translateY(40px) scale(.985); transition:opacity .9s var(--ease), transform .9s var(--ease); }
+  .reveal.in{ opacity:1; transform:none; }
+  .reveal.d1{ transition-delay:.1s; } .reveal.d2{ transition-delay:.2s; } .reveal.d3{ transition-delay:.3s; }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; } .reveal{ opacity:1; transform:none; } html{ scroll-behavior:auto; } .glow{ display:none; }
+  }
+
+  /* LIGHTBOX */
+  .lb{ position:fixed; inset:0; z-index:100; background:rgba(8,6,18,.95); display:none; align-items:center; justify-content:center; padding:4vw; cursor:zoom-out; backdrop-filter:blur(6px); }
+  .lb.open{ display:flex; }
+  .lb img{ max-width:92vw; max-height:90vh; object-fit:contain; border-radius:14px; box-shadow:0 40px 90px rgba(0,0,0,.6); }
+  .lb .close{ position:absolute; top:20px; right:26px; color:#fff; font-size:2rem; cursor:pointer; opacity:.8; }
+</style>
+</head>
+<body>
+<div class="glow" id="glow"></div>
+<div class="progress" id="progress"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top">WEEKEND ✦ CREW</a>
+  <nav class="links">
+    <a href="#day1">01</a><a href="#day2">02</a><a href="#day3">03</a><a href="#day4">04</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="mesh"></div>
+  <div class="veil"></div>
+  <div class="inner">
+    <span class="kicker">Four days · One crew</span>
+    <h1><span class="l1">A WEEKEND</span><span class="l2">WITH FRIENDS</span></h1>
+    <div class="dates">DAY 01 — DAY 04 · edit the dates &amp; place here</div>
+  </div>
+  <div class="scrollcue"><span>Scroll</span><span class="dot"></span></div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="track">
+    <span class="fill">Good friends</span><span>✦</span><span>late nights</span><span>✦</span><span class="fill">long days</span><span>✦</span><span>zero plans</span><span>✦</span>
+    <span class="fill">Good friends</span><span>✦</span><span>late nights</span><span>✦</span><span class="fill">long days</span><span>✦</span><span>zero plans</span><span>✦</span>
+  </div>
+</div>
+
+<!-- INTRO -->
+<section class="intro wrap">
+  <p class="lead reveal">Some weekends you remember for a week. <em>This one we'll remember for years.</em></p>
+  <p class="sub reveal d1">Replace this with a short intro: who came, where you went, why it earned a whole website. A line or two is plenty.</p>
+</section>
+
+<!-- DAY 1 -->
+<section class="day" id="day1">
+  <div class="wrap">
+    <div class="day-head">
+      <div class="bignum reveal">01</div>
+      <div class="no reveal">Day One</div>
+      <h2 class="reveal d1">Arrivals</h2>
+      <div class="meta reveal d1">Add the date · Add the place</div>
+    </div>
+    <p class="narrative reveal">Set the scene for day one — the drive, the first hellos, dropping bags, the first round. Keep it short; let the photos do the talking.</p>
+    <figure class="full ph reveal" data-label="Day 1 · Photo 1"></figure>
+    <div class="grid g-2">
+      <figure class="ph reveal" data-label="Day 1 · Photo 2"></figure>
+      <figure class="ph reveal d1" data-label="Day 1 · Photo 3"></figure>
+    </div>
+    <div class="split">
+      <figure class="ph reveal" data-label="Day 1 · Photo 4"></figure>
+      <div class="txt reveal d1"><h3>The <em>first</em> night</h3><p>A caption-paragraph for a standout moment of day one. Replace with your own words.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="quote wrap">
+  <blockquote class="reveal">"A great <em>pull-quote</em> from the weekend — something someone actually said."</blockquote>
+  <cite class="reveal d1">— who said it</cite>
+</section>
+
+<!-- DAY 2 -->
+<section class="day" id="day2">
+  <div class="wrap">
+    <div class="day-head">
+      <div class="bignum reveal">02</div>
+      <div class="no reveal">Day Two</div>
+      <h2 class="reveal d1">The Big Day Out</h2>
+      <div class="meta reveal d1">Add the date · Add the place</div>
+    </div>
+    <p class="narrative reveal">Day two is the headline — the hike, the trip, the long lunch. Say what you did and tee up the gallery.</p>
+    <div class="grid g-3">
+      <figure class="ph reveal" data-label="Day 2 · Photo 1"></figure>
+      <figure class="ph reveal d1" data-label="Day 2 · Photo 2"></figure>
+      <figure class="ph reveal d2" data-label="Day 2 · Photo 3"></figure>
+    </div>
+    <figure class="full ph reveal" data-label="Day 2 · Photo 4"></figure>
+    <div class="split flip">
+      <div class="txt reveal"><h3>Worth <em>every</em> step</h3><p>Caption a highlight of the day. Replace with your own words.</p></div>
+      <figure class="ph reveal d1" data-label="Day 2 · Photo 5"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- DAY 3 -->
+<section class="day" id="day3">
+  <div class="wrap">
+    <div class="day-head">
+      <div class="bignum reveal">03</div>
+      <div class="no reveal">Day Three</div>
+      <h2 class="reveal d1">Slow Morning, Long Night</h2>
+      <div class="meta reveal d1">Add the date · Add the place</div>
+    </div>
+    <p class="narrative reveal">The lazy day — the cooking, the games, the night that ran later than planned. Tell that story.</p>
+    <div class="split">
+      <figure class="ph reveal" data-label="Day 3 · Photo 1"></figure>
+      <div class="txt reveal d1"><h3>Around the <em>table</em></h3><p>Replace with your own words about a favourite moment of day three.</p></div>
+    </div>
+    <div class="grid g-2">
+      <figure class="ph reveal" data-label="Day 3 · Photo 2"></figure>
+      <figure class="ph reveal d1" data-label="Day 3 · Photo 3"></figure>
+    </div>
+    <figure class="full ph reveal" data-label="Day 3 · Photo 4"></figure>
+  </div>
+</section>
+
+<section class="quote wrap">
+  <blockquote class="reveal">"Another line that <em>captures the mood</em> of the weekend."</blockquote>
+  <cite class="reveal d1">— who said it</cite>
+</section>
+
+<!-- DAY 4 -->
+<section class="day" id="day4">
+  <div class="wrap">
+    <div class="day-head">
+      <div class="bignum reveal">04</div>
+      <div class="no reveal">Day Four</div>
+      <h2 class="reveal d1">Goodbyes</h2>
+      <div class="meta reveal d1">Add the date · Add the place</div>
+    </div>
+    <p class="narrative reveal">The last breakfast, the slow packing, the "let's do this again soon." Wrap the story here.</p>
+    <figure class="full ph reveal" data-label="Day 4 · Photo 1"></figure>
+    <div class="grid g-3">
+      <figure class="ph reveal" data-label="Day 4 · Photo 2"></figure>
+      <figure class="ph reveal d1" data-label="Day 4 · Photo 3"></figure>
+      <figure class="ph reveal d2" data-label="Day 4 · Photo 4"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section class="closing">
+  <div class="mesh2"></div>
+  <div class="inner wrap">
+    <div class="no reveal">Until next time</div>
+    <h2 class="reveal d1">THE END.</h2>
+    <p class="reveal d2">Four days, one good crew. Thanks for the memories — here's to the next one.</p>
+  </div>
+</section>
+
+<footer>
+  <a class="top" href="#top"><span>↑ Back to top</span></a>
+  <div>Made with friends · <span id="year"></span></div>
+</footer>
+
+<div class="lb" id="lb"><span class="close">&times;</span><img alt="" id="lbImg" /></div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const nav = document.getElementById('nav');
+  const progress = document.getElementById('progress');
+  const onScroll = () => {
+    nav.classList.toggle('scrolled', scrollY > 50);
+    const h = document.documentElement.scrollHeight - innerHeight;
+    progress.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + '%';
+  };
+  onScroll(); addEventListener('scroll', onScroll, { passive:true });
+
+  // cursor glow
+  const glow = document.getElementById('glow');
+  if(!reduce && matchMedia('(pointer:fine)').matches){
+    addEventListener('mousemove', e => { glow.style.left = e.clientX+'px'; glow.style.top = e.clientY+'px'; }, { passive:true });
+  } else { glow.style.display='none'; }
+
+  // reveal
+  const io = new IntersectionObserver((es)=>{ es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); },
+    { threshold:.12, rootMargin:'0px 0px -8% 0px' });
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // tilt on photos
+  if(!reduce && matchMedia('(pointer:fine)').matches){
+    document.querySelectorAll('figure').forEach(f=>{
+      f.addEventListener('mousemove', e=>{ const r=f.getBoundingClientRect();
+        const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+        f.style.transform=`perspective(900px) rotateX(${ -y*5 }deg) rotateY(${ x*5 }deg)`; });
+      f.addEventListener('mouseleave', ()=>{ f.style.transform=''; });
+    });
+  }
+
+  // lightbox
+  const lb=document.getElementById('lb'), lbImg=document.getElementById('lbImg');
+  document.addEventListener('click', e=>{ const img=e.target.closest('figure img');
+    if(img){ lbImg.src=img.currentSrc||img.src; lbImg.alt=img.alt||''; lb.classList.add('open'); }
+    else if(e.target.closest('#lb')){ lb.classList.remove('open'); lbImg.src=''; } });
+  addEventListener('keydown', e=>{ if(e.key==='Escape'){ lb.classList.remove('open'); lbImg.src=''; } });
+</script>
+</body>
+</html>
